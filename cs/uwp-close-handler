@@ -1,0 +1,35 @@
+Windows.UI.Core.Preview.SystemNavigationManagerPreview.GetForCurrentView ().CloseRequested += async (sender, args) => {
+    args.Handled = true;
+
+    var curView = CoreApplication.GetCurrentView ();
+    var newWindow = curView.CoreWindow;
+
+    ContentDialog closeDialog;
+
+    if (curView.IsMain) {
+        closeDialog = new ContentDialog () {
+            Content = "Are you sure you want to quit {App-Name}?",
+            PrimaryButtonText = "Yes",
+            SecondaryButtonText = "No",
+            DefaultButton = ContentDialogButton.Secondary
+        };
+    } else {
+        closeDialog = new ContentDialog () {
+            Content = "Close this instance of {App-Name}?",
+            PrimaryButtonText = "Yes",
+            SecondaryButtonText = "No",
+            DefaultButton = ContentDialogButton.Secondary
+        };
+    }
+
+    var result = await closeDialog.ShowAsync ();
+    if (result == ContentDialogResult.Secondary) {
+        // Do nothing
+    } else {
+        if (curView.IsMain) {
+            Application.Current.Exit ();
+        } else {
+            newWindow.Close ();
+        }
+    }
+};
